@@ -1,10 +1,3 @@
-"""
-Spam Email Classifier
-=====================
-Uses TF-IDF Vectorizer + Multinomial Naive Bayes
-Trained on a labeled ham/spam dataset
-"""
-
 import pandas as pd
 import numpy as np
 from sklearn.feature_extraction.text import TfidfVectorizer
@@ -18,9 +11,6 @@ from sklearn.pipeline import Pipeline
 import warnings
 warnings.filterwarnings("ignore")
 
-# ─────────────────────────────────────────────
-# 1. DATASET  (built-in labeled examples)
-# ─────────────────────────────────────────────
 HAM_MESSAGES = [
     "Hey, are we still on for lunch tomorrow?",
     "Can you send me the project report by Friday?",
@@ -87,7 +77,6 @@ SPAM_MESSAGES = [
     "Act now — this once-in-a-lifetime offer expires tonight!",
 ]
 
-# Build DataFrame
 data = pd.DataFrame({
     "message": HAM_MESSAGES + SPAM_MESSAGES,
     "label":   ["ham"] * len(HAM_MESSAGES) + ["spam"] * len(SPAM_MESSAGES)
@@ -101,35 +90,26 @@ print(f"\n📊 Dataset: {len(data)} messages  |  "
       f"Ham: {(data.label=='ham').sum()}  |  "
       f"Spam: {(data.label=='spam').sum()}")
 
-# ─────────────────────────────────────────────
-# 2. TRAIN / TEST SPLIT
-# ─────────────────────────────────────────────
 X_train, X_test, y_train, y_test = train_test_split(
     data["message"], data["label"],
     test_size=0.25, random_state=42, stratify=data["label"]
 )
 print(f"\n🔀 Train size: {len(X_train)}  |  Test size: {len(X_test)}")
 
-# ─────────────────────────────────────────────
-# 3. PIPELINE: TF-IDF  +  Multinomial Naive Bayes
-# ─────────────────────────────────────────────
 pipeline = Pipeline([
     ("tfidf", TfidfVectorizer(
         lowercase=True,
         stop_words="english",
-        ngram_range=(1, 2),   # unigrams + bigrams
+        ngram_range=(1, 2),
         max_features=5000,
-        sublinear_tf=True     # apply log(1+tf) scaling
+        sublinear_tf=True   
     )),
-    ("clf", MultinomialNB(alpha=0.1))   # Laplace smoothing
+    ("clf", MultinomialNB(alpha=0.1))   
 ])
 
 pipeline.fit(X_train, y_train)
 print("\n✅ Model trained successfully!")
 
-# ─────────────────────────────────────────────
-# 4. EVALUATION
-# ─────────────────────────────────────────────
 y_pred = pipeline.predict(X_test)
 
 acc  = accuracy_score(y_test, y_pred)
@@ -154,9 +134,6 @@ print(f"              Predicted Ham  Predicted Spam")
 print(f"  Actual Ham       {cm[0][0]:<6}         {cm[0][1]}")
 print(f"  Actual Spam      {cm[1][0]:<6}         {cm[1][1]}")
 
-# ─────────────────────────────────────────────
-# 5. PREDICT NEW MESSAGES
-# ─────────────────────────────────────────────
 def classify(message: str) -> dict:
     pred   = pipeline.predict([message])[0]
     proba  = pipeline.predict_proba([message])[0]
