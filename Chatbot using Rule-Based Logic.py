@@ -1,11 +1,6 @@
 import re
 import datetime
 
-# i stored all the rules in a dictionary
-# key is a regex pattern to match what the user says
-# value is what the bot should reply
-# makes it easy to add new rules later
-
 rules = {
     r'\b(hi|hello|hey|howdy)\b'                        : "Hey there! How can I help you?",
     r'\b(bye|goodbye|exit|quit|see you)\b'              : "Bye! Take care :)",
@@ -61,11 +56,9 @@ def get_reply(msg):
 
             return reply
 
-    # nothing matched
     return "Hmm I don't know how to answer that. Type 'help' to see what I can do."
 
 
-# ---- console version ----
 def console_chat():
     print("Chatbot ready. Type 'bye' to exit.\n")
     while True:
