@@ -4,30 +4,18 @@ import tensorflow as tf
 from tensorflow import keras
 from tensorflow.keras import layers
 
-# loading the dataset - its already inside keras so no extra download needed
 (x_train, y_train), (x_test, y_test) = keras.datasets.mnist.load_data()
 
 print("train size:", x_train.shape)
 print("test size:", x_test.shape)
 
-# pixel values go from 0 to 255
-# dividing by 255 brings everything between 0 and 1
-# neural networks converge much faster with normalized inputs
 x_train = x_train / 255.0
 x_test  = x_test  / 255.0
-
-# each image is 28x28 = 784 pixels
-# flattening into a 1D array so the dense layers can take it as input
 x_train = x_train.reshape(-1, 784)
 x_test  = x_test.reshape(-1, 784)
-
-# one-hot encoding: digit 3 becomes [0,0,0,1,0,0,0,0,0,0]
 y_train = keras.utils.to_categorical(y_train, 10)
 y_test  = keras.utils.to_categorical(y_test,  10)
 
-# building the network
-# went with two hidden layers, 128 neurons then 64
-# added dropout in between to reduce overfitting
 model = keras.Sequential()
 model.add(layers.Dense(128, activation='relu', input_shape=(784,)))
 model.add(layers.Dropout(0.2))
@@ -71,7 +59,6 @@ plt.tight_layout()
 plt.savefig('training_curves.png')
 plt.show()
 
-# quick visual check on 10 random test images
 preds = model.predict(x_test[:10])
 pred_labels = np.argmax(preds, axis=1)
 true_labels = np.argmax(y_test[:10], axis=1)
@@ -89,15 +76,6 @@ plt.tight_layout()
 plt.savefig('sample_predictions.png')
 plt.show()
 
-# save so i dont have to retrain every single time
 model.save('mnist_model.h5')
 print("saved model to mnist_model.h5")
 
-# ---- test on your own handwritten image ----
-# uncomment this block and put your image path below
-# from PIL import Image
-# img = Image.open("my_digit.png").convert('L').resize((28, 28))
-# arr = np.array(img).astype('float32') / 255.0
-# arr = arr.reshape(1, 784)
-# out = model.predict(arr)
-# print("my digit is:", np.argmax(out))
